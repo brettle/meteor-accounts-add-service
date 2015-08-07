@@ -2,7 +2,7 @@ Package.describe({
   name: 'brettle:accounts-add-service',
   version: '0.0.1',
   summary: 'Allow users to add login services to their accounts',
-  git: ' git@github.com:brettle/meteor-accounts-multiple.git',
+  git: 'git@github.com:brettle/meteor-accounts-add-service.git',
   documentation: 'README.md'
 });
 
