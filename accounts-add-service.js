@@ -34,14 +34,6 @@ AccountsMultiple.register({
       setAttrs["services." + serviceName + "." + key] = value;
     });
 
-    // Non-destructively merge top-level properties
-    var attemptingTop = attemptingUser || {};
-    var attemptTop = failedAttempt.user;
-    attemptTop = _.omit(attemptTop, _.keys(attemptingTop));
-    _.each(attemptTop, function(value, key) {
-      setAttrs[key] = value;
-    });
-
     // Non-destructively merge profile properties
     var attemptingProfile = attemptingUser.profile || {};
     var attemptProfile = failedAttempt.user.profile;
@@ -49,6 +41,17 @@ AccountsMultiple.register({
     _.each(attemptProfile, function(value, key) {
       setAttrs["profile." + key] = value;
     });
+
+    // Non-destructively merge top-level properties
+    var attemptingTop = attemptingUser || {};
+    var attemptTop = failedAttempt.user;
+    attemptTop = _.omit(attemptTop, _.keys(attemptingTop));
+    delete attemptTop.profile; // handled above
+    delete attemptTop.services; // handled above
+    _.each(attemptTop, function(value, key) {
+      setAttrs[key] = value;
+    });
+
     Meteor.users.update(attemptingUser._id, {
       $set: setAttrs
     });

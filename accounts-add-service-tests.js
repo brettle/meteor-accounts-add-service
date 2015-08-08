@@ -11,7 +11,12 @@ Tinytest.add('AccountsAddService - logged in user logging in as new user adds se
   var connection = DDP.connect(Meteor.absoluteUrl());
 
   Meteor.users.remove({ 'services.test1.name': "testname"});
-  var testId = connection.call('login', { test1: "testname" }).id;
+  var testId = connection.call('login', {
+    test1: "testname",
+    docDefaults: {
+      username: 'testname'
+    }
+  }).id;
   test.isNotUndefined(testId);
   test.isNotNull(testId);
   var user = Meteor.users.findOne(testId);
@@ -19,16 +24,22 @@ Tinytest.add('AccountsAddService - logged in user logging in as new user adds se
 
   Meteor.users.remove({ 'services.test2.name': "test2name"});
   test.throws(function () {
-    connection.call('login', { test2: "test2name" }).id;
+    connection.call('login', {
+      test2: "test2name",
+      docDefaults: {
+        emails: [ { address: 'test2@example.com' } ],
+        username: 'test2name',
+        profile: { name: 'test2name' }
+      }
+    }).id;
   }, 'Service will be added');
 
   user = Meteor.users.findOne(testId);
   test.isNotUndefined(user.services.test2, 'user.services.test2 defined');
   test.isNotNull(user.services.test2, 'user.services.test2 not null');
-  test.equal(user.profile.test2_specific, 'test2name', 'merge profile');
-  test.equal(user.profile.doNotOverride, 'testname', 'merge profile non-destructively');
-  test.equal(user.test2_specific_top, 'test2name', 'merge top-level');
-  test.equal(user.doNotOverrideTop, 'testname', 'merge top-level non-destructively');
+  test.equal(user.profile.name, 'test2name', 'merge profile');
+  test.equal(user.emails[0].address, 'test2@example.com', 'merge top-level');
+  test.equal(user.username, 'testname', 'merge top-level non-destructively');
 
   connection.call('logout');
   var test2Id = connection.call('login', { test2: "test2name" }).id;
