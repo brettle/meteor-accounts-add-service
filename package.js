@@ -17,6 +17,7 @@ Package.onTest(function(api) {
   api.versionsFrom('1.1.0.2');
   api.use('tinytest');
   api.use('brettle:accounts-add-service');
+  api.use('brettle:accounts-testing-support');
   api.use('accounts-base');
   api.addFiles('accounts-add-service-tests.js', 'server');
 });

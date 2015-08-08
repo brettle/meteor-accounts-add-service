@@ -1,51 +1,3 @@
-Accounts.registerLoginHandler("test1", function (options) {
-    if (! options || ! options.test1) {
-      return undefined;
-    }
-    var user = Meteor.users.findOne({ 'services.test1.name': options.test1 });
-    if (user) {
-      return { userId: user._id };
-    }
-    var newUserId = Accounts.insertUserDoc(options, {
-      profile: {
-        doNotOverride: options.test1
-      },
-      services: {
-        test1: {
-          name: options.test1
-        }
-      }
-    });
-    return {
-        userId: newUserId
-    };
-});
-
-Accounts.registerLoginHandler("test2", function (options) {
-    if (! options || ! options.test2) {
-      return undefined;
-    }
-    var user = Meteor.users.findOne({ 'services.test2.name': options.test2 });
-    if (user) {
-      return { userId: user._id };
-    }
-    var newUserId = Accounts.insertUserDoc(options, {
-      profile: {
-        doNotOverride: options.test2,
-        specificToTest2: options.test2
-      },
-      services: {
-        test2: {
-          name: options.test2
-        }
-      }
-    });
-    return {
-        userId: newUserId
-    };
-});
-
-
 Tinytest.add('AccountsAddService - logged out user logging in succeeds', function (test) {
   var connection = DDP.connect(Meteor.absoluteUrl());
 
@@ -73,7 +25,7 @@ Tinytest.add('AccountsAddService - logged in user logging in as new user adds se
   user = Meteor.users.findOne(testId);
   test.isNotUndefined(user.services.test2, 'user.services.test2 defined');
   test.isNotNull(user.services.test2, 'user.services.test2 not null');
-  test.equal(user.profile.specificToTest2, 'test2name', 'merge');
+  test.equal(user.profile.test2_specific, 'test2name', 'merge');
   test.equal(user.profile.doNotOverride, 'testname', 'merge non-destructively');
 
   connection.call('logout');
