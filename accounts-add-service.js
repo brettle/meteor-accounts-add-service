@@ -33,7 +33,16 @@ AccountsMultiple.register({
     _.each(serviceData, function(value, key) {
       setAttrs["services." + serviceName + "." + key] = value;
     });
-    // Non-destructively merge profile attributes
+
+    // Non-destructively merge top-level properties
+    var attemptingTop = attemptingUser || {};
+    var attemptTop = failedAttempt.user;
+    attemptTop = _.omit(attemptTop, _.keys(attemptingTop));
+    _.each(attemptTop, function(value, key) {
+      setAttrs[key] = value;
+    });
+
+    // Non-destructively merge profile properties
     var attemptingProfile = attemptingUser.profile || {};
     var attemptProfile = failedAttempt.user.profile;
     attemptProfile = _.omit(attemptProfile, _.keys(attemptingProfile));

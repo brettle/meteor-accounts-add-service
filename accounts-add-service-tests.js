@@ -25,8 +25,10 @@ Tinytest.add('AccountsAddService - logged in user logging in as new user adds se
   user = Meteor.users.findOne(testId);
   test.isNotUndefined(user.services.test2, 'user.services.test2 defined');
   test.isNotNull(user.services.test2, 'user.services.test2 not null');
-  test.equal(user.profile.test2_specific, 'test2name', 'merge');
-  test.equal(user.profile.doNotOverride, 'testname', 'merge non-destructively');
+  test.equal(user.profile.test2_specific, 'test2name', 'merge profile');
+  test.equal(user.profile.doNotOverride, 'testname', 'merge profile non-destructively');
+  test.equal(user.test2_specific_top, 'test2name', 'merge top-level');
+  test.equal(user.doNotOverrideTop, 'testname', 'merge top-level non-destructively');
 
   connection.call('logout');
   var test2Id = connection.call('login', { test2: "test2name" }).id;
