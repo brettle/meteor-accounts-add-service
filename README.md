@@ -1,5 +1,6 @@
-# accounts-add-service
-============
+# brettle:accounts-add-service
+
+[![Build Status](https://travis-ci.org/brettle/meteor-accounts-add-service.svg?branch=master)](https://travis-ci.org/brettle/meteor-accounts-add-service)
 
 Allow users to add login services to their accounts.
 
