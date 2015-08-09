@@ -9,15 +9,15 @@ Package.describe({
 Package.onUse(function(api) {
   api.versionsFrom('1.1.0.2');
   api.use('accounts-base');
-  api.use('brettle:accounts-multiple', 'server');
+  api.use('brettle:accounts-multiple@0.0.1', 'server');
   api.addFiles('accounts-add-service.js', 'server');
 });
 
 Package.onTest(function(api) {
   api.versionsFrom('1.1.0.2');
   api.use('tinytest');
-  api.use('brettle:accounts-add-service');
-  api.use('brettle:accounts-testing-support');
+  api.use('brettle:accounts-add-service@0.0.1');
+  api.use('brettle:accounts-testing-support@0.0.1');
   api.use('accounts-base');
   api.addFiles('accounts-add-service-tests.js', 'server');
 });
