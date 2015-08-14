@@ -1,4 +1,6 @@
 Tinytest.add('AccountsAddService - logged out user logging in succeeds', function (test) {
+  AccountsMultiple._unregisterAll();
+  AccountsAddService._init();
   var connection = DDP.connect(Meteor.absoluteUrl());
 
   Meteor.users.remove({ 'services.test1.name': "testname" });
@@ -8,6 +10,8 @@ Tinytest.add('AccountsAddService - logged out user logging in succeeds', functio
 });
 
 Tinytest.add('AccountsAddService - logged in user logging in as new user adds service and merges profile', function (test) {
+  AccountsMultiple._unregisterAll();
+  AccountsAddService._init();
   var connection = DDP.connect(Meteor.absoluteUrl());
 
   Meteor.users.remove({ 'services.test1.name': "testname"});
@@ -47,6 +51,8 @@ Tinytest.add('AccountsAddService - logged in user logging in as new user adds se
 });
 
 Tinytest.add('AccountsAddService - logged in user logging in as existing user switches to that user', function (test) {
+  AccountsMultiple._unregisterAll();
+  AccountsAddService._init();
   var connection = DDP.connect(Meteor.absoluteUrl());
 
   Meteor.users.remove({ 'services.test2.name': "test2name"});

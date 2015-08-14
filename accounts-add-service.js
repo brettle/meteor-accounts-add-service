@@ -1,3 +1,5 @@
+AccountsAddService = {};
+
 function isMergeable(user) {
   // A user should be merged if they have never logged in. If they have
   // never logged in, they won't have a "resume" service.
@@ -5,7 +7,12 @@ function isMergeable(user) {
 }
 
 var mergeUserErrorReason = 'New login not needed. Service will be added to logged in user.';
-AccountsMultiple.register({
+
+AccountsAddService._init = function () {
+  AccountsMultiple.register(addServiceCallbackSet);
+}
+
+var addServiceCallbackSet = {
   validateSwitch: function(attemptingUser, attempt) {
     if (isMergeable(attempt.user)) {
       throw new Meteor.Error(Accounts.LoginCancelledError.numericError, mergeUserErrorReason);
@@ -56,7 +63,7 @@ AccountsMultiple.register({
       $set: setAttrs
     });
   }
-});
+};
 
 var OAuthEncryption = Package["oauth-encryption"] && Package["oauth-encryption"].OAuthEncryption;
 
@@ -68,3 +75,5 @@ function repinCredentials(serviceData, oldUserId, newUserId) {
     serviceData[key] = value;
   });
 }
+
+AccountsAddService._init();
