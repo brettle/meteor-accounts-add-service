@@ -1,3 +1,6 @@
+/* globals AccountsAddService, AccountsMultiple
+*/
+"use strict";
 var mergeUserErrorReason = AccountsAddService._mergeUserErrorReason;
 
 function isMergeable(user) {
@@ -8,12 +11,13 @@ function isMergeable(user) {
 
 AccountsAddService._init = function () {
   AccountsMultiple.register(addServiceCallbackSet);
-}
+};
 
 var addServiceCallbackSet = {
   validateSwitch: function(attemptingUser, attempt) {
     if (isMergeable(attempt.user)) {
-      throw new Meteor.Error(Accounts.LoginCancelledError.numericError, mergeUserErrorReason);
+      throw new Meteor.Error(Accounts.LoginCancelledError.numericError,
+        mergeUserErrorReason);
     }
     return true;
   },
@@ -28,8 +32,9 @@ var addServiceCallbackSet = {
     var serviceData = failedAttempt.user.services[serviceName];
 
     // Repin any pinned oauth credentials to the logged in user
-    if (serviceName !== "password" && serviceName !== "resume")
+    if (serviceName !== "password" && serviceName !== "resume") {
       repinCredentials(serviceData, failedAttempt.user._id, attemptingUser._id);
+    }
 
     Meteor.users.remove(failedAttempt.user._id);
 
@@ -63,13 +68,16 @@ var addServiceCallbackSet = {
   }
 };
 
-var OAuthEncryption = Package["oauth-encryption"] && Package["oauth-encryption"].OAuthEncryption;
+var OAuthEncryption = Package["oauth-encryption"] &&
+  Package["oauth-encryption"].OAuthEncryption;
 
 function repinCredentials(serviceData, oldUserId, newUserId) {
   _.each(_.keys(serviceData), function(key) {
     var value = serviceData[key];
-    if (OAuthEncryption && OAuthEncryption.isSealed(value))
-      value = OAuthEncryption.seal(OAuthEncryption.open(value, oldUserId), newUserId);
+    if (OAuthEncryption && OAuthEncryption.isSealed(value)) {
+      value =
+        OAuthEncryption.seal(OAuthEncryption.open(value, oldUserId), newUserId);
+    }
     serviceData[key] = value;
   });
 }
