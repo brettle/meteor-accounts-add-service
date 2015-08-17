@@ -1,12 +1,10 @@
-AccountsAddService = {};
+var mergeUserErrorReason = AccountsAddService._mergeUserErrorReason;
 
 function isMergeable(user) {
   // A user should be merged if they have never logged in. If they have
   // never logged in, they won't have a "resume" service.
   return !(user.services && user.services.resume);
 }
-
-var mergeUserErrorReason = 'New login not needed. Service will be added to logged in user.';
 
 AccountsAddService._init = function () {
   AccountsMultiple.register(addServiceCallbackSet);
