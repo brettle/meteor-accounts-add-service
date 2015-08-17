@@ -1,7 +1,7 @@
 /* globals AccountsAddService, AccountsMultiple */
 "use strict";
 Tinytest.add(
-  'AccountsAddService - logged out user logging in succeeds',
+  'brettle:accounts-add-service - logged out user logging in succeeds',
   function (test) {
     AccountsMultiple._unregisterAll();
     AccountsAddService._init();
@@ -15,7 +15,7 @@ Tinytest.add(
 );
 
 Tinytest.add(
-  'AccountsAddService - logged in user adds new service and merges profile',
+  'brettle:accounts-add-service - logged in user adds service merges profile',
   function (test) {
     AccountsMultiple._unregisterAll();
     AccountsAddService._init();
@@ -59,7 +59,7 @@ Tinytest.add(
 );
 
 Tinytest.add(
-  'AccountsAddService - logged in user switches to existing user',
+  'brettle:accounts-add-service - logged in user switches to existing user',
   function (test) {
     AccountsMultiple._unregisterAll();
     AccountsAddService._init();
