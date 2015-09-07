@@ -2,7 +2,7 @@
 
 Package.describe({
   name: 'brettle:accounts-add-service',
-  version: '0.3.0',
+  version: '0.3.1',
   summary: 'Allow users to add login services to their accounts',
   git: 'https://github.com/brettle/meteor-accounts-add-service.git',
   documentation: 'README.md'
@@ -13,9 +13,11 @@ Package.onUse(function(api) {
   api.use('underscore');
   api.use('brettle:workaround-issue-4331@0.0.1');
   api.use('brettle:workaround-issue-4970@0.0.1');
+  api.use('brettle:workaround-issue-5110@0.0.1');
   api.use('brettle:accounts-multiple@0.0.1', 'server');
   api.export('AccountsAddService');
   api.addFiles('accounts-add-service-common.js');
+  api.addFiles('accounts-add-service-client.js', 'client');
   api.addFiles('accounts-add-service-server.js', 'server');
 });
 
