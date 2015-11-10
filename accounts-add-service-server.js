@@ -52,11 +52,40 @@ var addServiceCallbackSet = {
       setAttrs["profile." + key] = value;
     });
 
+    // Non-destructively merge emails
+    if (failedAttempt.user.emails) {
+      var attemptingEmails = attemptingUser.emails || [];
+      var attemptEmails = failedAttempt.user.emails;
+      var mergedEmails = attemptingEmails.concat(attemptEmails);
+      mergedEmails = _.uniq(mergedEmails, false, function (email) { 
+        return email.address;
+      });
+      setAttrs.emails = mergedEmails;
+    }
+
+    // Non-destructively merge email verification tokens
+    if (failedAttempt.user.services && 
+        failedAttempt.user.services.email && 
+        failedAttempt.user.services.email.verificationTokens) {
+      var attemptingTokens = (
+        attemptingUser.services && 
+        attemptingUser.services.email && 
+        attemptingUser.services.email.verificationTokens
+      ) || [];
+      var attemptTokens = failedAttempt.user.services.email.verificationTokens;
+      var mergedTokens = attemptingTokens.concat(attemptTokens);
+      mergedTokens = _.uniq(mergedTokens, false, function (tokenRecord) { 
+        return tokenRecord.token;
+      });
+      setAttrs["services.email.verificationTokens"] = mergedTokens;
+    }
+
     // Non-destructively merge top-level properties
     var attemptingTop = attemptingUser || {};
     var attemptTop = failedAttempt.user;
     attemptTop = _.omit(attemptTop, _.keys(attemptingTop));
     delete attemptTop.profile; // handled above
+    delete attemptTop.emails; // handled above
     delete attemptTop.services; // handled above
     _.each(attemptTop, function(value, key) {
       setAttrs[key] = value;

@@ -30,17 +30,31 @@ Tinytest.add(
     }).id;
     test.isNotUndefined(testId);
     test.isNotNull(testId);
+    Accounts.addEmail(testId, 'test1@example.com');
+    Accounts.sendVerificationEmail(testId);
     var user = Meteor.users.findOne(testId);
+    test.equal(user.services.email.verificationTokens.length, 1, "has token");
+    var oldEmailVerificationToken = user.services.email.verificationTokens[0];
     test.isUndefined(user.services.test2);
 
     Meteor.users.remove({ 'services.test2.name': "test2name"});
+    var newEmailVerificationToken = {
+      token: "newToken",
+      address: "newAddress",
+      when: new Date()
+    };
     test.throws(function () {
       connection.call('login', {
         test2: "test2name",
         docDefaults: {
           emails: [ { address: 'test2@example.com' } ],
           username: 'test2name',
-          profile: { name: 'test2name' }
+          profile: { name: 'test2name' },
+          services: {
+            email: {
+              verificationTokens: [newEmailVerificationToken]
+            }
+          }
         }
       });
     }, 'Service will be added');
@@ -49,8 +63,11 @@ Tinytest.add(
     test.isNotUndefined(user.services.test2, 'user.services.test2 defined');
     test.isNotNull(user.services.test2, 'user.services.test2 not null');
     test.equal(user.profile.name, 'test2name', 'merge profile');
-    test.equal(user.emails[0].address, 'test2@example.com', 'merge top-level');
+    test.equal(user.emails[0].address, 'test1@example.com', 'keep old emails');
+    test.equal(user.emails[1].address, 'test2@example.com', 'add new emails');
     test.equal(user.username, 'testname', 'merge top-level non-destructively');
+    test.equal(user.services.email.verificationTokens, 
+      [oldEmailVerificationToken, newEmailVerificationToken], "token added");
 
     connection.call('logout');
     var test2Id = connection.call('login', { test2: "test2name" }).id;
