@@ -28,7 +28,7 @@ Package.onTest(function(api) {
   api.use('accounts-base');
   api.use('accounts-password');
   api.use('brettle:accounts-add-service@0.3.3');
-  api.use('brettle:accounts-testing-support@0.4.1');
+  api.use('brettle:accounts-testing-support@0.4.3');
   api.use('brettle:accounts-multiple@0.3.1', 'server');
   api.addFiles('accounts-add-service-server-tests.js', 'server');
 });
