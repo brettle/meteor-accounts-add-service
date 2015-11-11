@@ -3,10 +3,21 @@
 "use strict";
 var mergeUserErrorReason = AccountsAddService._mergeUserErrorReason;
 
+// The first time a user logs in, we set his hasLoggedIn property so that
+// we don't accidentally merge his account if his "resume" service is removed.
+Accounts.onLogin(function (attemptInfo) {
+  if (attemptInfo.user && ! attemptInfo.user.hasLoggedIn) {
+    Meteor.users.update(attemptInfo.user._id, {
+      $set: { hasLoggedIn: true }
+    });
+  }
+});
+
 function isMergeable(user) {
   // A user should be merged if they have never logged in. If they have
-  // never logged in, they won't have a "resume" service.
-  return !(user.services && user.services.resume);
+  // never logged in, they won't have a "resume" service and they won't have
+  // the `hasLoggedIn` property.
+  return !(user.services && user.services.resume) && !(user.hasLoggedIn);
 }
 
 AccountsAddService._init = function () {

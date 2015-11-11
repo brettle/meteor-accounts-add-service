@@ -86,6 +86,12 @@ Tinytest.add(
     var test2Id = connection.call('login', { test2: "test2name" }).id;
     test.isNotUndefined(test2Id);
     test.isNotNull(test2Id);
+    
+    // Make sure we don't just rely on the existence of the 'resume' service.
+    // See https://github.com/brettle/meteor-accounts-add-service/issues/1
+    Meteor.users.update({ 'services.test2.name': "test2name"}, {
+      $unset: {'services.resume': ''}
+    });
 
     connection.call('logout');
     Meteor.users.remove({ 'services.test1.name': "testname"});
