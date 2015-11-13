@@ -109,3 +109,130 @@ Tinytest.add(
     test.isUndefined(user.services.test1, 'no user.services.test1');
   }
 );
+
+Tinytest.add(
+  'brettle:accounts-add-service - add hasLoggedIn to existing resume users',
+  function (test) {
+    AccountsMultiple._unregisterAll();
+    AccountsAddService._init();
+    var connection = DDP.connect(Meteor.absoluteUrl());
+    
+    // Add a user who logged in after 0.3.5 and didn't lose his resume service
+    // (i.e. has services.resume and hasLoggedIn). This user should be left
+    // alone.
+    connection.call('login', { test1: "resumeYesHasLoggedInYes" });
+
+    // Add a user who didn't log in or logged in before 0.3.5 but lost his
+    // resume service (i.e. has neither services.resume nor hasLoggedIn). This
+    // user should be left alone because we can't tell which is the case.
+    Meteor.users.update(connection.call('login', { 
+      test1: "resumeNoHasLoggedInNo" 
+    }).id, {
+      $unset: {
+        hasLoggedIn: '',
+        'services.resume': ''
+      }
+    });    
+    
+    // Add a user who logged in after 0.3.5 and lost his resume service (i.e.
+    // doesn't have services.resume but has hasLoggedIn). This user should be
+    // left alone.
+    Meteor.users.update(connection.call('login', {
+      test1: "resumeNoHasLoggedInYes" 
+    }).id, {
+      $unset: {
+        'services.resume': ''
+      }
+    });
+
+    // Add a user who logged in before 0.3.5 and didn't lose his resume service
+    // (i.e. has services.resume but not hasLoggedIn). This user should get
+    // hasLoggedIn added.
+    var resumeYesHasLoggedInNoId = 
+      connection.call('login', { test1: "resumeYesHasLoggedInNo" }).id;
+    Meteor.users.update(resumeYesHasLoggedInNoId, {
+      $unset: { hasLoggedIn: '' }
+    });
+        
+    connection.call('logout');
+    
+    var usersAdded = [];
+    var usersRemoved = [];
+    var usersChanged = [];
+    var observer = Meteor.users.find().observeChanges({
+      added: function (newUserId) {
+        usersAdded.push(newUserId);
+      },
+      changed: function (userId, fields) {
+        usersChanged.push({ userId: userId, fields: fields });
+      },
+      removed: function (oldUserId) {
+        usersRemoved.push(oldUserId);
+      }
+    });
+    usersAdded = []; // Ignore the users that were there already
+    
+    // Clear the control collection
+    AccountsAddService._migrationControl.remove({}); 
+
+    AccountsAddService.databaseMigrationEnabled = false;
+    test.isFalse(AccountsAddService._migrateDatabase(), 'migration disabled');
+    waitForCallbacksToFinish();
+    test.equal(usersAdded.length + usersRemoved.length + usersChanged.length, 0,
+      'no users affected when migration disabled');
+    
+    AccountsAddService.databaseMigrationEnabled = true;
+    test.equal(AccountsAddService._migrateDatabase(), 1, '1 user updated');
+    waitForCallbacksToFinish();
+    test.equal(usersAdded.length + usersRemoved.length, 0, 
+      'no users added/removed when migration enabled');
+    test.equal(usersChanged, [{
+      userId: resumeYesHasLoggedInNoId,
+      fields: {
+        hasLoggedIn: true
+      }
+    }], 'only updated user who has resume service but not hasLoggedIn');
+
+    // Unmigrate the user for the remainder of the test
+    Meteor.users.update(resumeYesHasLoggedInNoId, {
+      $unset: { hasLoggedIn: '' }
+    });
+    waitForCallbacksToFinish();
+    usersAdded = [];
+    usersRemoved = [];
+    usersChanged = [];
+    test.isFalse(AccountsAddService._migrateDatabase(), 'migrate only once');
+    waitForCallbacksToFinish();
+    test.equal(usersAdded.length + usersRemoved.length + usersChanged.length, 0,
+      'no users affected when already migrated');
+
+    AccountsAddService._migrationControl.update('addHasLoggedIn', {
+      $set: {
+        startedOn: new Date()
+      }
+    });
+    test.isFalse(AccountsAddService._migrateDatabase(), 'migrate in progress');
+    waitForCallbacksToFinish();
+    test.equal(usersAdded.length + usersRemoved.length + usersChanged.length, 0,
+      'no users affected when migration in progress');
+
+    observer.stop();
+  }
+
+);
+
+// Wait until the observeChanges callbacks have been called before returning. To
+// do this, we insert into to a separate collection that we observe, and assume
+// that by the time that the added callback is called on our collection, all
+// other observe callbacks have already been called.
+var testCollection = new Mongo.Collection("AccountsAddServiceTest");
+var waitForCallbacksToFinish = Meteor.wrapAsync(function (cb) {
+  testCollection.remove({});
+  var observer = testCollection.find().observe({
+    added: function () {
+      observer.stop();
+      cb.call();
+    }
+  });
+  testCollection.insert({});
+});

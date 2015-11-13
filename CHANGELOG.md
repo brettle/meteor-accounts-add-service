@@ -4,6 +4,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.5] 2015-11-13
+
+### Fixed
+
+Bug #1: Existing account without resume service deleted if logged in user logs
+into it. For details, see the [Notes section of README.md](README.md#notes)
+
 ## [0.3.4] 2015-11-09
 
 ### Fixed
