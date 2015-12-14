@@ -22,7 +22,7 @@ for an overview of the suite and a live demo.
 
 - Works with any login service (accounts-password, acccounts-google, etc.)
 
-- Works with accounts-ui and other similar packages.
+- Works with `accounts-ui` and other similar packages.
 
 - Does not permanently monkey patch Meteor core.
 
@@ -34,6 +34,15 @@ meteor add brettle:accounts-add-service
 ## Usage
 
 Nothing to do. It should just work once installed.
+
+When a service is added to an existing user, it is reported as a
+`Meteor.Error(Accounts.LoginCancelledError, 'New login not needed. Service will
+be added to logged in user.')` because a new account was not created.  The
+`accounts-ui` package and the `useraccounts` suite will ignore that error when
+adding an external login service, but _not_ when adding the password service.
+When adding the password service, they will display the "New login not
+needed..." message as a red error message to the user. To suppress those error
+messages, `meteor add brettle:accounts-patch-ui`.
 
 ## Notes
 

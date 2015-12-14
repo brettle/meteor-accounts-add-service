@@ -4,6 +4,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.0] 2015-12-13
+
+### Changed
+
+Moved the fix for brettle/meteor-accounts-deluxe#1 (Red text error message when adding password account) into optional `brettle:accounts-patch-ui` package which patches the `accounts-ui` package and the `useraccounts` suite to workaround the problem.
+
 ## [0.3.5] 2015-11-13
 
 ### Fixed
@@ -47,7 +53,9 @@ packages.
 
 Support Meteor 1.0.4 or later.
 
-[Unreleased] https://github.com/brettle/meteor-accounts-add-service/compare/v0.3.4...HEAD
+[Unreleased] https://github.com/brettle/meteor-accounts-add-service/compare/v1.0.0...HEAD
+[1.0.0] https://github.com/brettle/meteor-accounts-add-service/compare/v0.3.5...v1.0.0
+[0.3.5] https://github.com/brettle/meteor-accounts-add-service/compare/v0.3.4...v0.3.5
 [0.3.4] https://github.com/brettle/meteor-accounts-add-service/compare/v0.3.3...v0.3.4
 [0.3.3] https://github.com/brettle/meteor-accounts-add-service/compare/v0.3.2...v0.3.3
 [0.3.2] https://github.com/brettle/meteor-accounts-add-service/compare/v0.3.1...v0.3.2
